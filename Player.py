@@ -10,12 +10,14 @@ card_map = {
 
 
 class Player:
-    def __init__(self, cash):
+    def __init__(self, cash, deck):
         self.cash = cash
         self.hand = []
-        self.deck = Deck()
+        self.deck = deck
         self.is_stand = False
         self.is_busted = False
+        self.score = 0
+        self.other_score = 0
 
     def print_hand(self):
         line = ""
@@ -25,19 +27,46 @@ class Player:
 
     def calc_score(self):
         global card_map
-        score = 0
-        other_score = 0
+        self.score = 0
+        self.other_score = 0
         for card in self.hand:
             if card_map[card.face] == 0:
-                other_score += 11
-                score += 1
+                self.other_score += 11
+                self.score += 1
             else:
-                score += card_map[card.face]
-                other_score += card_map[card.face]
+                self.score += card_map[card.face]
+                self.other_score += card_map[card.face]
 
-        if score > 21 and other_score > 21:
+        if self.score > 21 and self.other_score > 21:
             self.is_busted = True
-        return score, other_score
 
+        return self.score, self.other_score
 
+    def get_bet(self):
+        # get bet from player:
+        while True:
+            try:
+                bet = int(input("What is your initial bet?\n"))
+                if bet > 0:
+                    if (self.cash - bet) < 0:
+                        print("Error: You don't have enough cash (You have ${} left)".format(self.cash))
+                    else:
+                        self.cash -= bet
+                        break
+                else:
+                    print("Error: Please enter a positive integer")
+            except ValueError:
+                print("Error: Please enter a valid amount")
+        print("You initially have bet {} amount of dollars. You have ${} left.".format(bet, self.cash))
+        return bet
 
+    def hit(self):
+        self.hand.append(self.deck.draw_card())
+
+    def stand(self):
+        self.is_stand = True
+
+    def reset(self):
+        self.score, self.other_score = 0, 0
+        self.hand = []
+        self.is_stand, self.is_busted = False, False
