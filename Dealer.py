@@ -1,9 +1,15 @@
 from Deck import *
+from Player import *
 
 
-class Dealer:
+class Dealer(Player):
     def __init__(self):
-        self.deck = Deck()
+        super().__init__(self)
 
-    def deal_card(self):
-        return self.deck.draw_card()
+    def print_hand(self):
+        line = "[Hidden Card] "
+
+        for i in range(1, len(self.hand)):
+            line += "[{} of {}] ".format(self.hand[i].face, self.hand[i].suite)
+
+        return line
